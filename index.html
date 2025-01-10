@@ -453,75 +453,9 @@ a.ss.one:hover:before, a.ss.one:hover:after{
         accurateTrackBounce:true
    });
 
-document.addEventListener('DOMContentLoaded', function(){
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js';
-    script.onload = function(){
-        particlesJS("snow", {
-            "particles": {
-                "number": {
-                    "value": 200,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff"
-                },
-                "opacity": {
-                    "value": 0.7,
-                    "random": false,
-                    "anim": {
-                        "enable": false
-                    }
-                },
-                "size": {
-                    "value": 5,
-                    "random": true,
-                    "anim": {
-                        "enable": false
-                    }
-                },
-                "line_linked": {
-                    "enable": false
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 5,
-                    "direction": "bottom",
-                    "random": true,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": true,
-                        "rotateX": 300,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                "events": {
-                    "onhover": {
-                        "enable": false
-                    },
-                    "onclick": {
-                        "enable": false
-                    },
-                    "resize": false
-                }
-            },
-            "retina_detect": true
-        });
-    }
-    document.head.append(script);
-});
 </script>
 </head>
 <body>
-	<div id="snow"></div>
-	<div id="content">
 	<header>
        <!-- <nav>
             <a class="icon night" style="display: inline-block;" id="toggle_dark" href="#"></a>
@@ -569,8 +503,6 @@ document.addEventListener('DOMContentLoaded', function(){
         <!--<a href="https://twitter.com/iamsomon_" style="color: #008C8C;"><i class="fab fa-twitter"></i></a>-->
         <!--<a href="https://opensea.io/iamsomon" style="color: #008C8C;"><i class="fab fa-ethereum"></i></a>-->
     </footer>
-	</div>	
-    
 
     <script src="https://code.jquery.com/jquery-1.9.0.min.js"></script>
     
