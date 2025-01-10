@@ -129,7 +129,10 @@ p {
     height: 4px;
   }
 }
-
+#content{
+  position: relative;
+  z-index-1;
+}
 #snow {
  position: fixed;
  top: 0;
