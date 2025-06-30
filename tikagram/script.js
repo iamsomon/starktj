@@ -3,6 +3,10 @@ const backendUrl = 'https://tikagram-backend.onrender.com'; // URL вашего 
 document.getElementById('download-btn').addEventListener('click', async () => {
     const videoUrl = document.getElementById('video-url').value;
     const statusMessage = document.getElementById('status-message');
+    const resultContainer = document.getElementById('resultContainer');
+
+    // Очистка предыдущих результатов
+    resultContainer.innerHTML = '';
 
     if (!videoUrl) {
         statusMessage.textContent = 'Пожалуйста, введите ссылку.';
@@ -20,7 +24,15 @@ document.getElementById('download-btn').addEventListener('click', async () => {
 
         if (response.ok) {
             const data = await response.json();
-            window.location.href = data.downloadLink;
+            if (data.downloadLink) {
+                const videoPreview = document.createElement('video');
+                videoPreview.src = data.downloadLink;
+                videoPreview.controls = true;
+                videoPreview.style.width = '100%';
+                resultContainer.appendChild(videoPreview);
+            } else {
+                statusMessage.textContent = 'Видео не найдено.';
+            }
         } else {
             const error = await response.json();
             statusMessage.textContent = error.message || 'Ошибка при скачивании видео.';
