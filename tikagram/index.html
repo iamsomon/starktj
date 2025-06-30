@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tikagram - Download Instagram & TikTok Videos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Tikagram">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <style>
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #6366f1;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .video-preview {
+            transition: all 0.3s ease;
+        }
+        .video-preview:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-2">Tikagram</h1>
+            <p class="text-gray-600">Download videos from Instagram and TikTok without watermark</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <!-- URL Input -->
+            <div class="mb-6">
+                <div class="flex items-center border-2 border-indigo-300 rounded-lg overflow-hidden">
+                    <input 
+                        type="text" 
+                        id="videoUrl" 
+                        placeholder="Paste Instagram or TikTok link here..." 
+                        class="flex-grow px-4 py-3 focus:outline-none"
+                    >
+                    <button 
+                        id="downloadBtn" 
+                        class="bg-indigo-600 text-white px-6 py-3 font-medium hover:bg-indigo-700 transition-colors"
+                    >
+                        Download
+                    </button>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Works with posts, reels, stories, and TikTok videos</p>
+            </div>
+
+            <!-- Result Container -->
+            <div id="resultContainer" class="hidden">
+                <div class="border-t pt-6">
+                    <h3 class="text-xl font-semibold mb-4">Download Options</h3>
+                    <div id="downloadOptions" class="space-y-4">
+                        <!-- Options will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden py-8">
+                <div class="loader"></div>
+                <p class="text-center mt-4 text-gray-600">Processing your video...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                <p id="errorText"></p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-gray-600 pb-8">
+            <p>© 2025 Tikagram - All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('downloadBtn');
+            const videoUrl = document.getElementById('videoUrl');
+            const resultContainer = document.getElementById('resultContainer');
+            const downloadOptions = document.getElementById('downloadOptions');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            downloadBtn.addEventListener('click', processUrl);
+            videoUrl.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') processUrl();
+            });
+
+            function processUrl() {
+                const url = videoUrl.value.trim();
+                
+                if (!url) {
+                    showError('Please enter a valid URL');
+                    return;
+                }
+
+                // Check if it's Instagram or TikTok URL
+                const isInstagram = url.includes('instagram.com');
+                const isTiktok = url.includes('tiktok.com');
+                
+                if (!isInstagram && !isTiktok) {
+                    showError('Please enter a valid Instagram or TikTok URL');
+                    return;
+                }
+
+                // Show loading
+                loading.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+
+                // Real API call
+                const apiUrl = isInstagram 
+                    ? `https://api.instagramdownloader.org/api/ig?url=${encodeURIComponent(url)}`
+                    : `https://api.tikdown.org/api/tik?url=${encodeURIComponent(url)}`;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        loading.classList.add('hidden');
+                        
+                        if (data.error) {
+                            showError(data.error || 'Failed to fetch video. Please try again.');
+                            return;
+                        }
+
+                        // Generate real download options
+                        generateRealDownloadOptions(isInstagram ? 'instagram' : 'tiktok', data);
+                        resultContainer.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        loading.classList.add('hidden');
+                        showError('Network error. Please check your connection and try again.');
+                        console.error('API Error:', error);
+                    });
+            }
+
+            function generateRealDownloadOptions(platform, apiData) {
+                downloadOptions.innerHTML = '';
+                
+                // Extract real data from API response
+                const videoData = {
+                    thumbnail: apiData.thumbnail || apiData.cover || 
+                        (platform === 'instagram' 
+                            ? 'https://i.imgur.com/IGplaceholder.jpg' 
+                            : 'https://i.imgur.com/TTplaceholder.jpg'),
+                    username: apiData.author || apiData.username || 'unknown_user',
+                    description: apiData.description || apiData.title || 
+                        (platform === 'instagram' ? 'Instagram video' : 'TikTok video'),
+                    downloadUrl: apiData.videoUrl || apiData.url,
+                    noWatermarkUrl: apiData.noWatermark || apiData.videoUrlNoWatermark || null,
+                    audioUrl: apiData.audioUrl || null
+                };
+
+                // Video Preview
+                const previewHtml = `
+                    <div class="video-preview bg-gray-50 rounded-lg overflow-hidden mb-6">
+                        <div class="relative pt-[56.25%] bg-gray-200">
+                            <img src="${videoData.thumbnail}" alt="Video thumbnail" class="absolute top-0 left-0 w-full h-full object-cover">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <button class="bg-black bg-opacity-50 text-white rounded-full w-16 h-16 flex items-center justify-center hover:bg-opacity-70 transition-all">
+                                    <i class="fas fa-play text-2xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-medium">@${videoData.username}</h4>
+                            <p class="text-gray-600 mt-1">${videoData.description}</p>
+                        </div>
+                    </div>
+                `;
+                downloadOptions.innerHTML += previewHtml;
+
+                // Download Buttons
+                let buttonsHtml = `
+                    <div class="grid grid-cols-1 ${videoData.noWatermarkUrl ? 'md:grid-cols-2' : ''} gap-4">
+                        <a href="${videoData.downloadUrl}" download class="block bg-indigo-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i> Download ${platform === 'instagram' ? 'Video' : 'With Watermark'}
+                        </a>
+                `;
+
+                if (videoData.noWatermarkUrl) {
+                    buttonsHtml += `
+                        <a href="${videoData.noWatermarkUrl}" download class="block bg-green-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i> Download Without Watermark
+                        </a>
+                    `;
+                }
+
+                buttonsHtml += `</div>`;
+                downloadOptions.innerHTML += buttonsHtml;
+
+                // Audio Download (if available)
+                if (videoData.audioUrl) {
+                    const audioHtml = `
+                        <div class="mt-4">
+                            <a href="${videoData.audioUrl}" download class="block bg-purple-600 text-white text-center py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors">
+                                <i class="fas fa-music mr-2"></i> Download Audio Only
+                            </a>
+                        </div>
+                    `;
+                    downloadOptions.innerHTML += audioHtml;
+                }
+            }
+
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.classList.remove('hidden');
+                loading.classList.add('hidden');
+                resultContainer.classList.add('hidden');
+            }
+
+            // Handle potential service worker for PWA functionality
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
