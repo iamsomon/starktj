@@ -1,14 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARK</title>
+    <title>Notes</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/core.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
+<style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
@@ -74,39 +77,198 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-    <div class="floating-shapes">
-        <div class="shape w-20 h-20 top-1/4 left-1/4" style="animation-delay: 0s;"></div>
-        <div class="shape w-16 h-16 top-1/3 right-1/4" style="animation-delay: 1s;"></div>
-        <div class="shape w-24 h-24 bottom-1/4 left-1/3" style="animation-delay: 2s;"></div>
-        <div class="shape w-12 h-12 bottom-1/3 right-1/3" style="animation-delay: 3s;"></div>
-    </div>
-    
-    <div class="text-center px-6">
-        <a href="an.exe" download class="download-btn inline-flex items-center px-8 py-4 rounded-full text-white font-semibold text-lg cursor-pointer">
-            <i data-feather="download" class="mr-3 w-6 h-6"></i>
+<body class="min-h-screen bg-gray-50">
+    <!-- Download button top right -->
+    <div class="absolute top-4 right-4">
+        <a href="an.exe" download class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+            <i data-feather="download" class="w-4 h-4 mr-2"></i>
             Скачать
         </a>
     </div>
 
+    <!-- Chat container -->
+    <div class="container mx-auto max-w-4xl px-4 py-20">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Chat header -->
+            <div class="bg-indigo-600 text-white p-4">
+                <h1 class="text-xl font-semibold">Заметки</h1>
+            </div>
+            
+            <!-- Messages container -->
+            <div id="messages" class="h-[70vh] overflow-y-auto p-4 space-y-4"></div>
+            
+            <!-- Input area -->
+            <div class="border-t p-4 bg-gray-50">
+                <div class="flex space-x-2 mb-2">
+                    <button id="codeBtn" class="px-3 py-1 bg-gray-200 rounded text-sm hover:bg-gray-300">Код</button>
+                </div>
+                <div class="flex space-x-2">
+                    <input id="messageInput" type="text" placeholder="Заметка..." 
+                        class="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <button id="sendBtn" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code modal -->
+    <div id="codeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
+            <h2 class="text-xl font-semibold mb-4">Добавить код</h2>
+            <textarea id="codeInput" class="w-full h-64 p-2 border rounded font-mono text-sm" 
+                placeholder="Paste your code here..."></textarea>
+            <div class="flex justify-end space-x-2 mt-4">
+                <button id="cancelCode" class="px-4 py-2 border rounded">Отмена</button>
+                <button id="insertCode" class="px-4 py-2 bg-indigo-600 text-white rounded">Добавить</button>
+            </div>
+        </div>
+    </div>
     <script>
         feather.replace();
         
-        document.addEventListener('DOMContentLoaded', function() {
-            const shapesContainer = document.querySelector('.floating-shapes');
-            for (let i = 0; i < 8; i++) {
-                const shape = document.createElement('div');
-                shape.className = 'shape';
-                const size = Math.random() * 30 + 10;
-                shape.style.width = `${size}px`;
-                shape.style.height = `${size}px`;
-                shape.style.top = `${Math.random() * 100}%`;
-                shape.style.left = `${Math.random() * 100}%`;
-                shape.style.animationDelay = `${Math.random() * 6}s`;
-                shape.style.animationDuration = `${Math.random() * 3 + 4}s`;
-                shapesContainer.appendChild(shape);
+        // Google Sheets API configuration
+        // INSTRUCTIONS: Replace these values with your own
+        // 1. Create a Google Sheet and share it publicly (Anyone with the link can view)
+        // 2. Get the sheet ID from the URL (between /d/ and /edit)
+        // 3. Replace SHEET_ID below
+        // 4. The sheet should have columns: Timestamp, Message, IsCode
+        const SHEET_ID = '1qMWzsSa9xmqXNF-mHst7V46ltcSQuW1742B1IQYbw1c';
+        const API_KEY = 'AIzaSyDzkaC-3Hx0CXPQIsnkYxlVbDPOAcKZ5DU';
+        const SHEET_NAME = 'Chat'; // Change if your sheet has a different name
+
+        // DOM elements
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const codeBtn = document.getElementById('codeBtn');
+        const codeModal = document.getElementById('codeModal');
+        const codeInput = document.getElementById('codeInput');
+        const insertCodeBtn = document.getElementById('insertCode');
+        const cancelCodeBtn = document.getElementById('cancelCode');
+
+        // Load messages from Google Sheets
+        async function loadMessages() {
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                messagesContainer.innerHTML = '';
+                
+                if (data.values && data.values.length > 1) {
+                    // Skip header row
+                    data.values.slice(1).forEach(row => {
+                        const [timestamp, message, isCode] = row;
+                        addMessageToUI(message, isCode === 'TRUE', timestamp);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
             }
+        }
+
+        // Add message to UI
+        function addMessageToUI(message, isCode, timestamp = new Date().toLocaleString()) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'bg-gray-100 p-3 rounded-lg';
+            
+            if (isCode) {
+                messageDiv.innerHTML = `
+                    <div class="text-xs text-gray-500 mb-1">${timestamp}</div>
+                    <pre class="bg-gray-800 text-gray-100 p-3 rounded overflow-x-auto"><code>${message}</code></pre>
+                    <button class="copy-btn mt-2 text-gray-500 hover:text-indigo-600" data-content="${escapeHtml(message)}">
+                        <i data-feather="copy" class="w-4 h-4"></i>
+                    </button>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="text-xs text-gray-500 mb-1">${timestamp}</div>
+                    <div class="whitespace-pre-wrap">${message}</div>
+                    <button class="copy-btn mt-2 text-gray-500 hover:text-indigo-600" data-content="${escapeHtml(message)}">
+                        <i data-feather="copy" class="w-4 h-4"></i>
+                    </button>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            feather.replace();
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Add copy functionality
+            const copyBtns = document.querySelectorAll('.copy-btn');
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = btn.getAttribute('data-content');
+                    navigator.clipboard.writeText(content);
+                    
+                    // Show copied feedback
+                    const icon = btn.querySelector('i');
+                    icon.setAttribute('data-feather', 'check');
+                    feather.replace();
+                    
+                    setTimeout(() => {
+                        icon.setAttribute('data-feather', 'copy');
+                        feather.replace();
+                    }, 1000);
+                });
+            });
+        }
+
+        // Escape HTML for safe display
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMessages();
+            
+            // Send message
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            // Code modal
+            codeBtn.addEventListener('click', () => {
+                codeModal.classList.remove('hidden');
+                codeModal.classList.add('flex');
+                codeInput.focus();
+            });
+            
+            cancelCodeBtn.addEventListener('click', () => {
+                codeModal.classList.add('hidden');
+                codeModal.classList.remove('flex');
+                codeInput.value = '';
+            });
+            
+            insertCodeBtn.addEventListener('click', () => {
+                const code = codeInput.value.trim();
+                if (code) {
+                    addMessageToUI(code, true);
+                    // Here you would also send to Google Sheets
+                }
+                codeInput.value = '';
+                codeModal.classList.add('hidden');
+                codeModal.classList.remove('flex');
+            });
         });
+        
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                addMessageToUI(message, false);
+                // Here you would also send to Google Sheets
+                messageInput.value = '';
+            }
+        }
     </script>
 </body>
 </html>
