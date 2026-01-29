@@ -882,7 +882,7 @@
           paletteReset: 'Reset palette',
           generateBtn: 'Generate link',
           shareTitle: 'Render endpoint URL',
-          shareHint: 'Opening this URL downloads the image. Use it in automations or share directly.',
+          shareHint: 'Opening this URL shows the image. Add “&download=1” to download it.',
           copyBtn: 'Copy',
           liveLabel: 'Live preview',
           previewNote: 'Preview is scaled down; the render keeps full resolution.',
@@ -941,7 +941,7 @@
           paletteReset: 'Сброс палитры',
           generateBtn: 'Сформировать ссылку',
           shareTitle: 'Ссылка на рендер',
-          shareHint: 'При открытии ссылка скачивает изображение. Используйте её для автоматизаций или просто поделитесь.',
+          shareHint: 'При открытии ссылка показывает изображение. Для скачивания добавьте “&download=1”.',
           copyBtn: 'Копировать',
           liveLabel: 'Онлайн-превью',
           previewNote: 'Превью уменьшено; финальная обоина сохранит полное разрешение.',
@@ -1217,8 +1217,7 @@
           gradEnd: gradientEndField.value,
           textPrimary: textPrimaryField.value,
           textSecondary: textSecondaryField.value,
-          format: 'png',
-          download: '1'
+          format: 'png'
         });
         const url = new URL('render.html', window.location.href);
         url.search = params.toString();

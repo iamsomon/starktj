@@ -26,13 +26,13 @@
 
   const PLATFORM_LAYOUTS = {
     iOS: {
-      safeTop: 0.22,
-      safeBottom: 0.08,
+      safeTop: 0.26,
+      safeBottom: 0.12,
       columns: { '1': 1, '6': 2, '12': 3 }
     },
     Android: {
-      safeTop: 0.2,
-      safeBottom: 0.09,
+      safeTop: 0.22,
+      safeBottom: 0.11,
       columns: { '1': 1, '6': 2, '12': 3 }
     },
     Desktop: {
@@ -175,9 +175,9 @@
     const innerPadding = Math.min(width, height) * 0.08;
     const innerWidth = width - innerPadding * 2;
     const innerHeight = height - innerPadding * 2;
-    const titleFont = Math.round(height * 0.08);
-    const weekdayFont = Math.round(height * 0.045);
-    const dayFont = Math.round(height * 0.06 / Math.max(calendarRows.length / 5, 1));
+    const titleFont = Math.round(height * 0.072);
+    const weekdayFont = Math.round(height * 0.04);
+    const dayFont = Math.round(height * 0.05);
     const headerBlock = titleFont + weekdayFont + innerPadding * 0.8;
     const gridHeight = innerHeight - headerBlock;
     const rowHeight = gridHeight / calendarRows.length;
@@ -272,9 +272,10 @@
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    const paddingX = Math.max(width * 0.04, 48);
-    const safeTop = height * layout.safeTop;
-    const safeBottom = height * layout.safeBottom;
+    const paddingX = Math.max(width * 0.045, 52);
+    const extraInset = Math.max(height * 0.02, 24);
+    const safeTop = height * layout.safeTop + extraInset;
+    const safeBottom = height * layout.safeBottom + extraInset;
     const contentWidth = width - paddingX * 2;
     const contentHeight = height - safeTop - safeBottom;
     const columns = layout.columns[monthsMode] || 1;
