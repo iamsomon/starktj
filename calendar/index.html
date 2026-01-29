@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stark Calendar · Configurator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      font-family: "Manrope", "Avenir Next", "Segoe UI", "SF Pro Display", sans-serif;
+      color: #eef2ff;
+      background-color: #070a16;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 15% 10%, rgba(37, 99, 235, 0.25), transparent 55%),
+        radial-gradient(circle at 80% 0%, rgba(14, 165, 233, 0.18), transparent 50%),
+        #070a16;
+      color: inherit;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: min(1180px, 100%);
+      padding: 48px 16px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    header.hero {
+      background: rgba(5, 8, 20, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      padding: 36px 36px 32px;
+      display: grid;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.hero::after {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -80px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35), transparent 70%);
+      filter: blur(12px);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 0.75rem;
+      color: rgba(226, 232, 255, 0.6);
+      margin: 0 0 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4.2vw, 3.4rem);
+    }
+
+    .hero-copy {
+      max-width: 640px;
+      color: rgba(226, 232, 255, 0.82);
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .year-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.18);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      color: rgba(226, 232, 255, 0.9);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: fit-content;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: rgba(245, 247, 251, 0.7);
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: #f97316;
+      color: #0f172a;
+    }
+
+    .ghost-btn,
+    .primary-btn,
+    .shortcut-btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 26px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .primary-btn {
+      background: linear-gradient(120deg, #4f46e5, #f97316);
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.35);
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.07);
+      color: rgba(245, 247, 251, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .ghost-btn.small {
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+    }
+
+    main.config-layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.05fr) minmax(320px, 0.95fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .panel {
+      border-radius: 24px;
+      padding: 28px;
+      background: rgba(8, 11, 24, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .field-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(226, 232, 255, 0.6);
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    select,
+    input[type="text"],
+    input[type="color"] {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(4, 7, 18, 0.85);
+      color: #f5f7fb;
+      font-size: 1rem;
+    }
+
+    select:focus,
+    input:focus {
+      outline: none;
+      border-color: rgba(116, 185, 255, 0.9);
+      box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.2);
+    }
+
+    input[type="color"] {
+      height: 46px;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 16px;
+      background: transparent;
+    }
+
+    .ratio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ratio-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ratio-custom {
+      display: none;
+      width: 100%;
+    }
+
+    .ratio-custom.visible {
+      display: block;
+    }
+
+    .field-hint {
+      font-size: 0.82rem;
+      color: rgba(226, 232, 255, 0.55);
+      margin: 0;
+    }
+
+    .segmented {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .segmented-btn {
+      border: none;
+      background: transparent;
+      color: rgba(245, 247, 251, 0.75);
+      font-size: 0.85rem;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .segmented-btn.active {
+      background: rgba(79, 70, 229, 0.95);
+      color: #fefefe;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+    }
+
+    .chip.live {
+      color: #4ade80;
+      background: rgba(34, 197, 94, 0.18);
+      border-color: rgba(74, 222, 128, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip.live::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .device-stage {
+      display: flex;
+      justify-content: center;
+    }
+
+    .device-shell {
+      position: relative;
+      padding: 22px;
+      border-radius: 34px;
+      background: radial-gradient(circle at top, rgba(8, 10, 22, 0.7), rgba(1, 3, 8, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 30px 60px rgba(2, 3, 8, 0.8);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .device-shell::after,
+    .device-shell::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .device-shell[data-platform="iOS"]::before {
+      top: 18px;
+      width: 140px;
+      height: 18px;
+      border-radius: 0 0 16px 16px;
+      background: rgba(0, 0, 0, 0.8);
+      opacity: 1;
+    }
+
+    .device-shell[data-platform="Android"]::before {
+      top: 12px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+      opacity: 1;
+    }
+
+    .device-shell[data-platform="Desktop"]::before {
+      opacity: 0;
+    }
+
+    .device-shell[data-platform="Desktop"] {
+      max-width: none;
+      width: 100%;
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .device-shell[data-platform="Desktop"]::after {
+      bottom: -38px;
+      width: 160px;
+      height: 38px;
+      border-radius: 20px;
+      background: rgba(10, 10, 10, 0.85);
+      opacity: 1;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 28px;
+      box-shadow: 0 24px 50px rgba(4, 5, 15, 0.8);
+      background: #000;
+    }
+
+    .preview-note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(226, 232, 255, 0.62);
+    }
+
+    .share-card {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      background: rgba(5, 8, 20, 0.6);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .share-card.visible {
+      display: flex;
+    }
+
+    .share-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .share-row input {
+      flex: 1;
+      min-width: 200px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      background: rgba(4, 7, 18, 0.85);
+      color: #f5f7fb;
+      padding: 12px 14px;
+    }
+
+    .share-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .shortcut-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 18px;
+      background: linear-gradient(120deg, #6157ff, #26c6da);
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 600;
+      box-shadow: 0 12px 25px rgba(38, 198, 218, 0.35);
+    }
+
+    .shortcut-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+    }
+
+    .shortcut-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+
+    .status {
+      font-size: 0.85rem;
+      color: rgba(226, 232, 255, 0.6);
+      min-height: 1rem;
+    }
+
+    .invalid {
+      border-color: #f97316 !important;
+    }
+
+    section.steps {
+      display: grid;
+      gap: 24px;
+    }
+
+    .steps-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .step-card {
+      padding: 22px;
+      border-radius: 20px;
+      background: rgba(8, 11, 24, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-card h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .step-card ol {
+      padding-left: 18px;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+      color: rgba(226, 232, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    footer.author {
+      display: grid;
+      gap: 18px;
+      padding: 28px;
+      border-radius: 22px;
+      background: rgba(8, 11, 24, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .author-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .anchor-link {
+      color: rgba(226, 232, 255, 0.8);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(226, 232, 255, 0.25);
+      padding-bottom: 2px;
+    }
+
+    @media (max-width: 1024px) {
+      main.config-layout {
+        grid-template-columns: 1fr;
+      }
+
+      header.hero {
+        padding: 32px 28px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 32px 12px 60px;
+      }
+
+      header.hero {
+        padding: 28px 22px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .hero-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .lang-switch {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .ratio-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .share-row {
+        flex-direction: column;
+      }
+
+      .share-row input {
+        min-width: 100%;
+      }
+
+      .shortcut-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero" id="top">
+      <div class="hero-top">
+        <div>
+          <h1 data-i18n="title">Stark Calendar</h1>
+          <p class="hero-copy" data-i18n="tagline">
+            Design calendar wallpapers that match your device and palette, then export automation-friendly links.
+          </p>
+        </div>
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn active" data-lang="ru">RU</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a class="anchor-link" href="#config" data-i18n="ctaConfig">Generate link</a>
+        <a class="anchor-link" href="#guide" data-i18n="ctaGuide">How to automate</a>
+      </div>
+    </header>
+
+    <main class="config-layout" id="config">
+      <section class="panel">
+        <form id="config-form">
+          <div class="form-grid">
+            <label>
+              <span class="field-label" data-i18n="platformLabel">Platform</span>
+              <select name="platform" id="platform" required>
+                <option value="iOS">iOS</option>
+                <option value="Android">Android</option>
+                <option value="Desktop">Desktop</option>
+              </select>
+            </label>
+            <label>
+              <span class="field-label" data-i18n="themeLabel">Theme</span>
+              <select name="theme" id="theme" required>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </label>
+            <div class="ratio-group">
+              <span class="field-label" data-i18n="ratioLabel">Screen ratio</span>
+              <div class="ratio-row">
+                <select id="ratio-select" name="ratio-select" aria-label="Ratio preset">
+                  <option value="20:9">20:9</option>
+                  <option value="19.5:9">19.5:9</option>
+                  <option value="19:9">19:9</option>
+                  <option value="18:9">18:9</option>
+                  <option value="16:9">16:9</option>
+                  <option value="3:2">3:2</option>
+                  <option value="4:3">4:3</option>
+                  <option value="1:1">1:1</option>
+                  <option value="custom" data-i18n="ratioCustomOption">Custom</option>
+                </select>
+                <button class="ghost-btn small" type="button" id="redetect" data-i18n="detectBtn">Detect device</button>
+              </div>
+              <input class="ratio-custom" type="text" id="ratio-custom" name="ratio" maxlength="12" data-i18n-placeholder="ratioPlaceholder" placeholder="19.5:9" />
+              <p class="field-hint" data-i18n="ratioHint">Example: 19.5:9 or 16:9</p>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label" data-i18n="viewLabel">Calendar span</span>
+            <div class="segmented" id="months-toggle" role="group">
+              <button type="button" class="segmented-btn active" data-value="1" data-i18n="viewSingle">1 month</button>
+              <button type="button" class="segmented-btn" data-value="6" data-i18n="viewHalf">6 months</button>
+              <button type="button" class="segmented-btn" data-value="12" data-i18n="viewFull">Full year</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label" data-i18n="colorsLabel">Palette</span>
+            <div class="color-grid">
+              <label>
+                <span class="field-label" data-i18n="accentLabel">Accent</span>
+                <input type="color" id="accent" name="accent" value="#ff7847" />
+              </label>
+              <label>
+                <span class="field-label" data-i18n="gradientStartLabel">Gradient start</span>
+                <input type="color" id="gradient-start" name="gradient-start" value="#0d1b2a" />
+              </label>
+              <label>
+                <span class="field-label" data-i18n="gradientEndLabel">Gradient end</span>
+                <input type="color" id="gradient-end" name="gradient-end" value="#0f172a" />
+              </label>
+              <label>
+                <span class="field-label" data-i18n="textPrimaryLabel">Text primary</span>
+                <input type="color" id="text-primary" name="text-primary" value="#f4f7ff" />
+              </label>
+              <label>
+                <span class="field-label" data-i18n="textSecondaryLabel">Text secondary</span>
+                <input type="color" id="text-secondary" name="text-secondary" value="#9fb0d8" />
+              </label>
+            </div>
+            <button class="ghost-btn" type="button" id="reset-palette" data-i18n="paletteReset">Reset palette</button>
+          </div>
+
+          <div class="actions">
+            <button class="primary-btn" type="submit" data-i18n="generateBtn">Generate link</button>
+          </div>
+
+          <section class="share-card" id="share-output">
+            <h2 data-i18n="shareTitle">Render endpoint URL</h2>
+            <p class="status" id="share-description" data-i18n="shareHint">
+              Copy this link into Shortcuts, Tasker, or any automation runner.
+            </p>
+            <div class="share-row">
+              <input type="text" id="share-link" readonly />
+              <button class="ghost-btn" type="button" id="copy-link" data-i18n="copyBtn">Copy</button>
+            </div>
+            <div class="share-actions" id="share-actions" hidden>
+              <button class="shortcut-btn" type="button" id="shortcut-btn">
+                <span class="shortcut-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="shortcutGradientA" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#5D5FEF" />
+                        <stop offset="100%" stop-color="#2EC7E6" />
+                      </linearGradient>
+                      <linearGradient id="shortcutGradientB" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#9333EA" />
+                        <stop offset="100%" stop-color="#FF5F6D" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M7 14.5L16.5 5a4 4 0 015.7 0l3.8 3.8a4 4 0 010 5.6L16 24.4a4 4 0 01-5.6 0L7 21a4 4 0 010-5.6z" fill="url(#shortcutGradientA)" />
+                    <path d="M11 18.5l3.5-3.5 8.9 8.9a4 4 0 010 5.6l-2.4 2.4a4 4 0 01-5.6 0L7 22.1z" fill="url(#shortcutGradientB)" />
+                  </svg>
+                </span>
+                <span data-i18n="shortcutBtn">Add to Shortcuts</span>
+              </button>
+            </div>
+            <span class="status" id="copy-status"></span>
+          </section>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="preview-header">
+          <span class="chip live" data-i18n="liveLabel">Live preview</span>
+          <span class="chip" id="dimension-chip" data-i18n="dimensionDetect">Detecting...</span>
+        </div>
+        <div class="device-stage">
+          <div class="device-shell" id="device-shell" data-platform="iOS">
+            <canvas id="preview-canvas" width="420" height="840"></canvas>
+          </div>
+        </div>
+        <p class="preview-note" data-i18n="previewNote">
+          Preview is scaled down; the render keeps full resolution.
+        </p>
+      </section>
+    </main>
+
+    <section class="steps" id="guide">
+      <div class="steps-header">
+        <div>
+          <p class="eyebrow" data-i18n="guideEyebrow">Automation guides</p>
+          <h2 data-i18n="guideTitle">Set it once, then forget</h2>
+        </div>
+        <a class="anchor-link" href="#top" data-i18n="backTop">Back to top</a>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card">
+          <h3 data-i18n="guideIosTitle">iPhone · 5 минут</h3>
+          <ol>
+            <li data-i18n="guideIosStep1">Open Shortcuts → Automation → Time of day → Daily.</li>
+            <li data-i18n="guideIosStep2">Add actions: “Get Contents of URL” → “Set Wallpaper”.</li>
+            <li data-i18n="guideIosStep3">Paste the generated link into the URL field and choose Lock Screen.</li>
+          </ol>
+        </article>
+        <article class="step-card">
+          <h3 data-i18n="guideAndroidTitle">Android · 10 минут</h3>
+          <ol>
+            <li data-i18n="guideAndroidStep1">Pick any automation app (MacroDroid/Tasker) and create a daily trigger.</li>
+            <li data-i18n="guideAndroidStep2">Fetch the URL from this generator and save it to a file.</li>
+            <li data-i18n="guideAndroidStep3">Set that file as the lock screen wallpaper.</li>
+          </ol>
+        </article>
+        <article class="step-card">
+          <h3 data-i18n="guideTipsTitle">Tips</h3>
+          <ol>
+            <li data-i18n="guideTipsStep1">Preview updates instantly when you change parameters.</li>
+            <li data-i18n="guideTipsStep2">If preview caches, the automation will still refresh daily.</li>
+            <li data-i18n="guideTipsStep3">Use color palettes to match your lock screen.</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <footer class="author">
+      <div>
+        <p class="eyebrow" data-i18n="authorEyebrow">About</p>
+        <h3 data-i18n="authorTitle">Stark Calendar Project</h3>
+        <p class="hero-copy" data-i18n="authorText">
+          Share your results or send feedback — it helps improve the wallpapers and templates.
+        </p>
+      </div>
+      <div class="author-links">
+        <a class="anchor-link" href="#config" data-i18n="authorLinkConfig">Generator</a>
+        <a class="anchor-link" href="#guide" data-i18n="authorLinkGuide">Automation guide</a>
+      </div>
+    </footer>
+  </div>
+
+  <script src="wallpaper.js"></script>
+  <script>
+    (() => {
+      const form = document.getElementById('config-form');
+      const langButtons = document.querySelectorAll('.lang-btn');
+      const platformField = document.getElementById('platform');
+      const themeField = document.getElementById('theme');
+      const ratioSelect = document.getElementById('ratio-select');
+      const ratioCustom = document.getElementById('ratio-custom');
+      const redetectButton = document.getElementById('redetect');
+      const monthsToggle = document.getElementById('months-toggle');
+      const accentField = document.getElementById('accent');
+      const gradientStartField = document.getElementById('gradient-start');
+      const gradientEndField = document.getElementById('gradient-end');
+      const textPrimaryField = document.getElementById('text-primary');
+      const textSecondaryField = document.getElementById('text-secondary');
+      const resetPaletteButton = document.getElementById('reset-palette');
+      const shareSection = document.getElementById('share-output');
+      const shareInput = document.getElementById('share-link');
+      const shareActions = document.getElementById('share-actions');
+      const shortcutButton = document.getElementById('shortcut-btn');
+      const copyButton = document.getElementById('copy-link');
+      const copyStatus = document.getElementById('copy-status');
+      const shareDescription = document.getElementById('share-description');
+      const previewCanvas = document.getElementById('preview-canvas');
+      const deviceShell = document.getElementById('device-shell');
+      const dimensionChip = document.getElementById('dimension-chip');
+      const yearBadge = document.getElementById('year-badge');
+
+      const STRINGS = {
+        en: {
+          eyebrow: 'Automation ready',
+          yearBadge: '{year} edition',
+          title: 'Stark Calendar',
+          tagline: 'Design calendar wallpapers that match your device and palette, then export automation-friendly links.',
+          ctaConfig: 'Generate link',
+          ctaGuide: 'How to automate',
+          platformLabel: 'Platform',
+          themeLabel: 'Theme',
+          ratioLabel: 'Screen ratio',
+          ratioPlaceholder: '19.5:9',
+          ratioHint: 'Enter values like 19.5:9 or 16:9',
+          ratioCustomOption: 'Custom',
+          detectBtn: 'Detect device',
+          viewLabel: 'Calendar span',
+          viewSingle: '1 month',
+          viewHalf: '6 months',
+          viewFull: 'Full year',
+          colorsLabel: 'Palette',
+          accentLabel: 'Accent',
+          gradientStartLabel: 'Gradient start',
+          gradientEndLabel: 'Gradient end',
+          textPrimaryLabel: 'Text primary',
+          textSecondaryLabel: 'Text secondary',
+          paletteReset: 'Reset palette',
+          generateBtn: 'Generate link',
+          shareTitle: 'Render endpoint URL',
+          shareHint: 'Copy this URL into Shortcuts, Tasker, or any automation runner.',
+          copyBtn: 'Copy',
+          liveLabel: 'Live preview',
+          previewNote: 'Preview is scaled down; the render keeps full resolution.',
+          copySuccess: 'Copied to clipboard',
+          copyFallback: 'Copied via selection',
+          copyError: 'Copy is unavailable here.',
+          shortcutBtn: 'Add to Shortcuts',
+          shortcutHint: 'Link copied. Paste it inside Shortcuts if needed.',
+          dimensionDetect: 'Detecting...',
+          chipLabels: { iOS: 'iOS', Android: 'Android', Desktop: 'Desktop' },
+          guideEyebrow: 'Automation guides',
+          guideTitle: 'Set it once, then forget',
+          backTop: 'Back to top',
+          guideIosTitle: 'iPhone · 5 minutes',
+          guideIosStep1: 'Open Shortcuts → Automation → Time of day → Daily.',
+          guideIosStep2: 'Add actions: “Get Contents of URL” → “Set Wallpaper”.',
+          guideIosStep3: 'Paste the generated link into the URL field and choose Lock Screen.',
+          guideAndroidTitle: 'Android · 10 minutes',
+          guideAndroidStep1: 'Pick any automation app (MacroDroid/Tasker) and create a daily trigger.',
+          guideAndroidStep2: 'Fetch the URL from this generator and save it to a file.',
+          guideAndroidStep3: 'Set that file as the lock screen wallpaper.',
+          guideTipsTitle: 'Tips',
+          guideTipsStep1: 'Preview updates instantly when you change parameters.',
+          guideTipsStep2: 'If preview caches, the automation will still refresh daily.',
+          guideTipsStep3: 'Use color palettes to match your lock screen.',
+          authorEyebrow: 'About',
+          authorTitle: 'Stark Calendar Project',
+          authorText: 'Share your results or send feedback — it helps improve the wallpapers and templates.',
+          authorLinkConfig: 'Generator',
+          authorLinkGuide: 'Automation guide'
+        },
+        ru: {
+          eyebrow: 'Готов к автоматизации',
+          yearBadge: 'Издание {year}',
+          title: 'Stark Calendar',
+          tagline: 'Создавайте обои-календари под своё устройство и мгновенно получайте ссылки для автоматизаций.',
+          ctaConfig: 'Сгенерировать ссылку',
+          ctaGuide: 'Как настроить',
+          platformLabel: 'Платформа',
+          themeLabel: 'Тема',
+          ratioLabel: 'Соотношение сторон',
+          ratioPlaceholder: '19.5:9',
+          ratioHint: 'Введите формат вроде 19.5:9 или 16:9',
+          ratioCustomOption: 'Свой вариант',
+          detectBtn: 'Определить устройство',
+          viewLabel: 'Диапазон календаря',
+          viewSingle: '1 месяц',
+          viewHalf: '6 месяцев',
+          viewFull: 'Год',
+          colorsLabel: 'Палитра',
+          accentLabel: 'Акцент',
+          gradientStartLabel: 'Начало градиента',
+          gradientEndLabel: 'Конец градиента',
+          textPrimaryLabel: 'Основной текст',
+          textSecondaryLabel: 'Вторичный текст',
+          paletteReset: 'Сброс палитры',
+          generateBtn: 'Сформировать ссылку',
+          shareTitle: 'Ссылка на рендер',
+          shareHint: 'Скопируйте ссылку и вставьте в команды Shortcuts, Tasker и т.д.',
+          copyBtn: 'Копировать',
+          liveLabel: 'Онлайн-превью',
+          previewNote: 'Превью уменьшено; финальная обоина сохранит полное разрешение.',
+          copySuccess: 'Скопировано',
+          copyFallback: 'Скопировано через выделение',
+          copyError: 'Не удалось скопировать',
+          shortcutBtn: 'Добавить в Команды',
+          shortcutHint: 'Ссылка скопирована. Вставьте её в Команды при необходимости.',
+          dimensionDetect: 'Определяем...',
+          chipLabels: { iOS: 'iOS', Android: 'Android', Desktop: 'Desktop' },
+          guideEyebrow: 'Автоматизация',
+          guideTitle: 'Настроил один раз — и забыл',
+          backTop: 'Наверх',
+          guideIosTitle: 'iPhone · 5 минут',
+          guideIosStep1: 'Открой Команды → Автоматизация → Время суток → Ежедневно.',
+          guideIosStep2: 'Добавь действия: «Получить содержимое URL» → «Установить обои».',
+          guideIosStep3: 'Вставь ссылку и выбери экран блокировки.',
+          guideAndroidTitle: 'Android · 10 минут',
+          guideAndroidStep1: 'Выбери приложение для автоматизации (MacroDroid/Tasker) и создай ежедневный триггер.',
+          guideAndroidStep2: 'Сохрани картинку по ссылке из генератора в файл.',
+          guideAndroidStep3: 'Укажи этот файл как обои экрана блокировки.',
+          guideTipsTitle: 'Советы',
+          guideTipsStep1: 'Превью обновляется мгновенно при смене параметров.',
+          guideTipsStep2: 'Если браузер кеширует картинку, автоматизация всё равно обновит её на устройстве.',
+          guideTipsStep3: 'Подбирайте палитры под ваш локскрин.',
+          authorEyebrow: 'Про проект',
+          authorTitle: 'Stark Calendar Project',
+          authorText: 'Делитесь результатами и обратной связью — это помогает улучшать шаблоны.',
+          authorLinkConfig: 'Генератор',
+          authorLinkGuide: 'Инструкция'
+        }
+      };
+
+      const THEME_PALETTES = {
+        dark: {
+          accent: '#ff7847',
+          gradientStart: '#0d1b2a',
+          gradientEnd: '#0f172a',
+          textPrimary: '#f4f7ff',
+          textSecondary: '#9fb0d8'
+        },
+        light: {
+          accent: '#1c45ff',
+          gradientStart: '#ffffff',
+          gradientEnd: '#c9d8ff',
+          textPrimary: '#0b1633',
+          textSecondary: '#5c678a'
+        }
+      };
+
+      const PLATFORM_PROFILES = {
+        iOS: { long: 2532, ratio: '19.5:9' },
+        Android: { long: 3120, ratio: '20:9' },
+        Desktop: { long: 2560, ratio: '16:9' }
+      };
+
+      const PRESET_RATIOS = ['20:9', '19.5:9', '19:9', '18:9', '16:9', '3:2', '4:3', '1:1'];
+
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+      function detectPlatform() {
+        const ua = navigator.userAgent || '';
+        if (/iPad|iPhone|iPod/.test(ua)) return 'iOS';
+        if (/Android/.test(ua)) return 'Android';
+        return 'Desktop';
+      }
+
+      const detectedDevicePlatform = detectPlatform();
+      const initialProfile = PLATFORM_PROFILES[detectedDevicePlatform] || PLATFORM_PROFILES.iOS;
+
+      const state = {
+        lang: (navigator.language || 'en').startsWith('ru') ? 'ru' : 'en',
+        devicePlatform: detectedDevicePlatform,
+        platform: detectedDevicePlatform,
+        theme: 'dark',
+        months: '1',
+        ratio: initialProfile.ratio,
+        customRatio: false,
+        width: 0,
+        height: 0,
+        baseLongSide: initialProfile.long
+      };
+
+      const applyRatioUI = (value) => {
+        if (PRESET_RATIOS.includes(value)) {
+          ratioSelect.value = value;
+          ratioCustom.classList.remove('visible');
+          ratioCustom.value = '';
+          state.customRatio = false;
+        } else {
+          ratioSelect.value = 'custom';
+          ratioCustom.classList.add('visible');
+          ratioCustom.value = value;
+          state.customRatio = true;
+        }
+      };
+
+      applyRatioUI(state.ratio);
+      let previewFrame;
+
+      const parseRatio = (value) => {
+        if (!value || typeof value !== 'string') return null;
+        const parts = value.split(':').map((part) => parseFloat(part.trim()));
+        if (parts.length !== 2 || parts.some((num) => !Number.isFinite(num) || num <= 0)) return null;
+        const long = Math.max(parts[0], parts[1]);
+        const short = Math.min(parts[0], parts[1]);
+        return { long, short };
+      };
+
+      const ratioValue = (ratioString) => {
+        const parsed = parseRatio(ratioString);
+        return parsed ? parsed.long / parsed.short : null;
+      };
+
+      const findClosestRatio = (aspect) => {
+        let match = null;
+        let delta = Number.MAX_VALUE;
+        PRESET_RATIOS.forEach((preset) => {
+          const value = ratioValue(preset);
+          if (!value) return;
+          const diff = Math.abs(value - aspect);
+          if (diff < delta) {
+            delta = diff;
+            match = preset;
+          }
+        });
+        return delta < 0.15 ? match : null;
+      };
+
+      const detectResolution = () => {
+        const { width, height } = window.screen;
+        const dpr = window.devicePixelRatio || 1;
+        return {
+          width: Math.round(width * dpr),
+          height: Math.round(height * dpr)
+        };
+      };
+
+      const systemTheme = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+        return 'dark';
+      };
+
+      const applyPaletteDefaults = (theme) => {
+        const palette = THEME_PALETTES[theme] || THEME_PALETTES.dark;
+        accentField.value = palette.accent;
+        gradientStartField.value = palette.gradientStart;
+        gradientEndField.value = palette.gradientEnd;
+        textPrimaryField.value = palette.textPrimary;
+        textSecondaryField.value = palette.textSecondary;
+      };
+
+      const computeResolutionFromRatio = (ratioString) => {
+        const parsed = parseRatio(ratioString);
+        if (!parsed) return null;
+        const profile = PLATFORM_PROFILES[state.platform] || PLATFORM_PROFILES.iOS;
+        const fallbackLong = profile.long || 2532;
+        const baseLong = state.baseLongSide || fallbackLong;
+        const longSide = clamp(baseLong, 800, 6000);
+        const shortSide = Math.max(320, Math.round(longSide * (parsed.short / parsed.long)));
+        if (state.platform === 'Desktop') {
+          return { width: longSide, height: shortSide };
+        }
+        return { width: shortSide, height: longSide };
+      };
+
+      const updateDimensionChip = () => {
+        if (!dimensionChip) return;
+        const strings = STRINGS[state.lang];
+        if (!state.width || !state.height) {
+          dimensionChip.textContent = strings.dimensionDetect;
+          return;
+        }
+        const label = strings.chipLabels[state.platform] || state.platform;
+        dimensionChip.textContent = `${label} · ${state.width} × ${state.height}px`;
+      };
+
+      const updateShortcutVisibility = () => {
+        if (!shareActions) return;
+        const shouldShow = state.platform === 'iOS';
+        shareActions.hidden = !shouldShow;
+      };
+
+      const updatePreview = () => {
+        const renderer = window.StarkWallpaper?.drawWallpaper;
+        if (!renderer) return;
+        const safeWidth = state.width || 1170;
+        const safeHeight = state.height || 2532;
+        const maxSide = 1000;
+        const scale = Math.min(maxSide / Math.max(safeWidth, safeHeight), 1);
+        previewCanvas.width = Math.round(safeWidth * scale);
+        previewCanvas.height = Math.round(safeHeight * scale);
+        renderer(previewCanvas, {
+          platform: state.platform,
+          theme: state.theme,
+          monthsMode: state.months,
+          lang: state.lang,
+          colors: {
+            accent: accentField.value,
+            gradientStart: gradientStartField.value,
+            gradientEnd: gradientEndField.value,
+            textPrimary: textPrimaryField.value,
+            textSecondary: textSecondaryField.value
+          }
+        });
+      };
+
+      const requestPreview = () => {
+        cancelAnimationFrame(previewFrame);
+        previewFrame = requestAnimationFrame(updatePreview);
+      };
+
+      const updateResolution = () => {
+        const result = computeResolutionFromRatio(state.ratio);
+        const ratioTarget = ratioSelect.value === 'custom' ? ratioCustom : ratioSelect;
+        if (!result) {
+          ratioTarget.classList.add('invalid');
+          return;
+        }
+        ratioTarget.classList.remove('invalid');
+        state.width = result.width;
+        state.height = result.height;
+        updateDimensionChip();
+        requestPreview();
+      };
+
+      const setPlatform = (platform, options = {}) => {
+        state.platform = platform;
+        platformField.value = platform;
+        deviceShell.dataset.platform = platform;
+        const profile = PLATFORM_PROFILES[platform] || PLATFORM_PROFILES.iOS;
+        state.baseLongSide = profile.long;
+        if (options.resetRatio || !state.customRatio) {
+          state.ratio = profile.ratio;
+          applyRatioUI(profile.ratio);
+        }
+        updateShortcutVisibility();
+        updateResolution();
+      };
+
+      const applyLanguage = (lang) => {
+        state.lang = lang;
+        document.documentElement.lang = lang;
+        const strings = STRINGS[lang];
+        const currentYear = new Date().getFullYear();
+        document.querySelectorAll('[data-i18n]').forEach((node) => {
+          const key = node.dataset.i18n;
+          if (strings[key]) node.textContent = strings[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
+          const key = node.dataset.i18nPlaceholder;
+          if (strings[key]) node.placeholder = strings[key];
+        });
+        if (yearBadge) {
+          yearBadge.textContent = strings.yearBadge.replace('{year}', currentYear);
+        }
+        langButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.lang === lang));
+        shareDescription.textContent = strings.shareHint;
+        updateDimensionChip();
+        requestPreview();
+      };
+
+      const buildURL = () => {
+        const params = new URLSearchParams({
+          platform: state.platform,
+          width: String(state.width || 1170),
+          height: String(state.height || 2532),
+          theme: state.theme,
+          lang: state.lang,
+          months: state.months,
+          accent: accentField.value,
+          gradStart: gradientStartField.value,
+          gradEnd: gradientEndField.value,
+          textPrimary: textPrimaryField.value,
+          textSecondary: textSecondaryField.value
+        });
+        const url = new URL('render.html', window.location.href);
+        url.search = params.toString();
+        return url.href;
+      };
+
+      const showShareURL = () => {
+        const url = buildURL();
+        shareInput.value = url;
+        shareSection.classList.add('visible');
+        copyStatus.textContent = '';
+        shareInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return url;
+      };
+
+      const copyToClipboard = async () => {
+        if (!shareInput.value) {
+          showShareURL();
+        }
+        const value = shareInput.value;
+        const strings = STRINGS[state.lang];
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(value);
+            copyStatus.textContent = strings.copySuccess;
+            return;
+          }
+          throw new Error('Clipboard API unavailable');
+        } catch (err) {
+          try {
+            shareInput.focus();
+            shareInput.select();
+            const success = document.execCommand('copy');
+            copyStatus.textContent = success ? strings.copyFallback : strings.copyError;
+          } catch (fallbackError) {
+            copyStatus.textContent = strings.copyError;
+          }
+        }
+      };
+
+      const handleShortcutLaunch = async () => {
+        if (shareActions?.hidden) return;
+        const url = shareInput.value || showShareURL();
+        const strings = STRINGS[state.lang];
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(url);
+            copyStatus.textContent = strings.shortcutHint;
+          }
+        } catch (err) {
+          copyStatus.textContent = strings.shortcutHint;
+        }
+
+        const deepLink = `shortcuts://create-shortcut?name=Stark%20Calendar&input=text&text=${encodeURIComponent(url)}`;
+        const anchor = document.createElement('a');
+        anchor.href = deepLink;
+        anchor.rel = 'noopener';
+        anchor.click();
+        setTimeout(() => {
+          window.location.href = deepLink;
+        }, 150);
+      };
+
+      const applyDetections = () => {
+        const actualPlatform = detectPlatform();
+        state.devicePlatform = actualPlatform;
+        const { width, height } = detectResolution();
+        const longSide = Math.max(width, height);
+        const shortSide = Math.min(width, height);
+        const aspect = longSide / shortSide;
+        const ratioString = findClosestRatio(aspect) || `${longSide}:${shortSide}`;
+        const profile = PLATFORM_PROFILES[actualPlatform] || PLATFORM_PROFILES.iOS;
+        profile.long = longSide;
+        profile.ratio = ratioString;
+        state.baseLongSide = longSide;
+        state.ratio = ratioString;
+        applyRatioUI(ratioString);
+        setPlatform(actualPlatform, { resetRatio: true });
+        const theme = systemTheme();
+        state.theme = theme;
+        themeField.value = theme;
+        applyPaletteDefaults(theme);
+        updateShortcutVisibility();
+      };
+
+      themeField.addEventListener('change', () => {
+        state.theme = themeField.value;
+        applyPaletteDefaults(state.theme);
+        requestPreview();
+      });
+
+      platformField.addEventListener('change', (event) => {
+        setPlatform(event.target.value, { resetRatio: true });
+      });
+
+      ratioSelect.addEventListener('change', () => {
+        if (ratioSelect.value === 'custom') {
+          ratioCustom.classList.add('visible');
+          state.customRatio = true;
+          if (!ratioCustom.value) {
+            ratioCustom.value = state.ratio;
+          }
+          state.ratio = ratioCustom.value || state.ratio;
+        } else {
+          ratioCustom.classList.remove('visible');
+          state.customRatio = false;
+          state.ratio = ratioSelect.value;
+        }
+        updateResolution();
+      });
+
+      ratioCustom.addEventListener('input', () => {
+        if (ratioSelect.value !== 'custom') return;
+        state.customRatio = true;
+        state.ratio = ratioCustom.value;
+        updateResolution();
+      });
+
+      monthsToggle.addEventListener('click', (event) => {
+        if (!event.target.matches('.segmented-btn')) return;
+        state.months = event.target.dataset.value;
+        monthsToggle.querySelectorAll('.segmented-btn').forEach((btn) => {
+          btn.classList.toggle('active', btn === event.target);
+        });
+        requestPreview();
+      });
+
+      langButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          applyLanguage(button.dataset.lang);
+        });
+      });
+
+      resetPaletteButton.addEventListener('click', () => {
+        applyPaletteDefaults(state.theme);
+        requestPreview();
+      });
+
+      redetectButton.addEventListener('click', applyDetections);
+      copyButton.addEventListener('click', copyToClipboard);
+      shortcutButton?.addEventListener('click', handleShortcutLaunch);
+
+      form.addEventListener('input', (event) => {
+        if (event.target.matches('input[type="color"]')) {
+          requestPreview();
+        }
+      });
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        showShareURL();
+      });
+
+      applyLanguage(state.lang);
+      updateShortcutVisibility();
+      applyDetections();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          requestPreview();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
