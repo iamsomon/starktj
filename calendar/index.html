@@ -1219,7 +1219,7 @@
           textSecondary: textSecondaryField.value,
           format: 'png'
         });
-        const url = new URL('render.html', window.location.href);
+        const url = new URL('wallpaper.php', window.location.href);
         url.search = params.toString();
         return url.href;
       };
