@@ -147,7 +147,19 @@
             setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
             return;
           }
-          window.location.replace(objectUrl);
+          document.body.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = objectUrl;
+          img.alt = 'Stark Calendar';
+          img.style.maxWidth = '100vw';
+          img.style.maxHeight = '100vh';
+          img.style.width = 'auto';
+          img.style.height = 'auto';
+          img.style.display = 'block';
+          img.addEventListener('load', () => {
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
+          });
+          document.body.appendChild(img);
         }, mime, quality);
       };
 
