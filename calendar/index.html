@@ -824,6 +824,7 @@
     </footer>
   </div>
 
+  <script src="config.js"></script>
   <script src="wallpaper.js"></script>
   <script>
     (() => {
@@ -881,7 +882,7 @@
           paletteReset: 'Reset palette',
           generateBtn: 'Generate link',
           shareTitle: 'Render endpoint URL',
-          shareHint: 'Copy this URL into Shortcuts, Tasker, or any automation runner.',
+          shareHint: 'Opening this URL downloads the image. Use it in automations or share directly.',
           copyBtn: 'Copy',
           liveLabel: 'Live preview',
           previewNote: 'Preview is scaled down; the render keeps full resolution.',
@@ -940,7 +941,7 @@
           paletteReset: 'Сброс палитры',
           generateBtn: 'Сформировать ссылку',
           shareTitle: 'Ссылка на рендер',
-          shareHint: 'Скопируйте ссылку и вставьте в команды Shortcuts, Tasker и т.д.',
+          shareHint: 'При открытии ссылка скачивает изображение. Используйте её для автоматизаций или просто поделитесь.',
           copyBtn: 'Копировать',
           liveLabel: 'Онлайн-превью',
           previewNote: 'Превью уменьшено; финальная обоина сохранит полное разрешение.',
@@ -1215,7 +1216,9 @@
           gradStart: gradientStartField.value,
           gradEnd: gradientEndField.value,
           textPrimary: textPrimaryField.value,
-          textSecondary: textSecondaryField.value
+          textSecondary: textSecondaryField.value,
+          format: 'png',
+          download: '1'
         });
         const url = new URL('render.html', window.location.href);
         url.search = params.toString();

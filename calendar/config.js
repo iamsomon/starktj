@@ -1,0 +1,1 @@
+window.STARK_RENDER_ENDPOINT = window.STARK_RENDER_ENDPOINT || '';

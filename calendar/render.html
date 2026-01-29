@@ -60,6 +60,8 @@
 
       const { drawWallpaper } = window.StarkWallpaper;
 
+      const params = new URLSearchParams(window.location.search);
+
       const detectDefaults = () => {
         const ua = navigator.userAgent || '';
         let platform = 'Desktop';
@@ -93,7 +95,6 @@
 
       const getConfig = () => {
         const defaults = detectDefaults();
-        const params = new URLSearchParams(window.location.search);
         const themeParam = params.get('theme');
         const resolvedTheme = themeParam === 'light' ? 'light' : themeParam === 'dark' ? 'dark' : defaults.theme;
 
@@ -128,6 +129,28 @@
         return canvas;
       };
 
+      const exportIfRequested = (canvas) => {
+        const format = (params.get('format') || '').toLowerCase();
+        if (!format) return;
+        const useJpeg = format === 'jpg' || format === 'jpeg';
+        const mime = useJpeg ? 'image/jpeg' : 'image/png';
+        const quality = useJpeg ? 0.92 : 1;
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const objectUrl = URL.createObjectURL(blob);
+          const shouldDownload = params.get('download') === '1';
+          if (shouldDownload) {
+            const link = document.createElement('a');
+            link.href = objectUrl;
+            link.download = `stark-calendar.${useJpeg ? 'jpg' : 'png'}`;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(objectUrl), 1200);
+            return;
+          }
+          window.location.replace(objectUrl);
+        }, mime, quality);
+      };
+
       const init = () => {
         const config = getConfig();
         const canvas = createCanvas(config);
@@ -138,6 +161,7 @@
           monthsMode: config.months,
           lang: config.lang
         });
+        exportIfRequested(canvas);
       };
 
       const run = () => {
