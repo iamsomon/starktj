@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Get back to your book, or write to us if you need a hand.">
+<title>How can we help? · SoNa</title><style>*{box-sizing:border-box}html{color-scheme:light dark;--paper:#f7f5ef;--ink:#172b29;--soft:#45635f;--line:#b9ccc4;--accent:#006b60}
+@media(prefers-color-scheme:dark){html{--paper:#112421;--ink:#eef4ed;--soft:#b7cfca;--line:#385954;--accent:#89e1cf}}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.62 system-ui,sans-serif}a{color:var(--accent);text-underline-offset:.2em}a:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+.wrap{width:min(750px,100% - 44px);margin:auto}header,footer{padding:26px 0;display:flex;gap:12px 22px;flex-wrap:wrap;align-items:center;justify-content:space-between}header{border-bottom:1px solid var(--line)}footer{border-top:1px solid var(--line);color:var(--soft);font-size:.88rem}
+.brand{font:1.9rem Georgia,serif;letter-spacing:-.04em;text-decoration:none;color:var(--ink)}nav{display:flex;gap:14px;flex-wrap:wrap}main{padding:60px 0 40px}h1{font:normal clamp(2.5rem,7vw,4.65rem)/.99 Georgia,serif;letter-spacing:-.045em;margin:0 0 20px;text-wrap:balance}h2{font:normal 1.63rem/1.2 Georgia,serif;margin:0 0 10px}p{margin:0}section{border-top:1px solid var(--line);padding:24px 0}section p,.lead{color:var(--soft)}.lead{font-size:1.14rem;margin-bottom:38px;max-width:36em}
+@media(max-width:500px){main{padding-top:39px}header,footer{align-items:flex-start}}</style></head>
+<body><div class="wrap">
+<header><a class="brand" href="/Sona/" data-keep-language>SoNa</a>
+<nav aria-label="Language"><a href="?lang=en" lang="en" hreflang="en">English</a><a href="?lang=ru" lang="ru" hreflang="ru">Русский</a></nav></header>
+<main id="main-en" lang="en" data-language="en"><h1>How can we help?</h1><p class="lead">Get back to your book, or write to us if you need a hand.</p>
+<section><h2>Read offline</h2><p>Open a book in Catalog and choose Save to Library. Find it later under Books → Downloaded. Check the Downloads & Storage settings if a download needs Wi-Fi.</p></section>
+<section><h2>Import your own books</h2><p>Open Books and choose Import from Files. You can also open the iOS share sheet in Files and choose SoNa.</p></section>
+<section><h2>Listen to a book</h2><p>Choose Listen on a supported book. For PDFs, narration is available when the file contains readable text. Use the player to change the voice or speed.</p></section>
+<section><h2>Manage your account</h2><p>Open Profile → Account to manage sign-in, export your personal data, or delete your account.</p></section>
+<section><h2>Restore SoNa Premium</h2><p>Open Profile → SoNa Premium → Restore Purchases using the Apple Account used for the purchase.</p></section>
+<section><h2>Contact support</h2><p>Email <a href="mailto:asz.stark@gmail.com?subject=SoNa%20Support">asz.stark@gmail.com</a>. Include the app version, your iPhone model, and what you were trying to do. Please leave passwords out of your message.</p></section></main><main id="main-ru" lang="ru" data-language="ru" hidden><h1>Чем помочь?</h1><p class="lead">Здесь можно быстро найти ответ и вернуться к книге. Если что-то не получилось, напиши нам.</p>
+<section><h2>Чтение офлайн</h2><p>Открой книгу в каталоге и нажми «Сохранить в библиотеку». Она появится в разделе «Книги» → «Загружено». Настройки Wi-Fi для скачивания есть в разделе «Загрузки и память».</p></section>
+<section><h2>Импорт своих книг</h2><p>В разделе «Книги» нажми «Импорт из „Файлов“». Также можно открыть меню «Поделиться» в приложении «Файлы» и выбрать SoNa.</p></section>
+<section><h2>Озвучка книги</h2><p>Нажми «Слушать». Для PDF озвучка доступна, если в файле есть читаемый текст. Голос и скорость можно изменить в плеере.</p></section>
+<section><h2>Управление аккаунтом</h2><p>В разделе «Профиль» → «Аккаунт» можно изменить способ входа, скачать личные данные или удалить аккаунт.</p></section>
+<section><h2>Восстановление SoNa Premium</h2><p>Открой «Профиль» → «SoNa Premium» → «Восстановить покупки» с тем же аккаунтом Apple, с которого была покупка.</p></section>
+<section><h2>Связаться с поддержкой</h2><p>Напиши на <a href="mailto:asz.stark@gmail.com?subject=SoNa%20Support">asz.stark@gmail.com</a>. Укажи версию SoNa, модель iPhone и что ты пытался сделать. Пароль в письмо добавлять не нужно.</p></section></main>
+<footer><span>© 2026 Somon Abdullozoda</span>
+<nav aria-label="SoNa"><a href="/Sona/support/" data-keep-language><span data-language="en">Support</span><span data-language="ru" hidden>Поддержка</span></a>
+<a href="/Sona/privacy/" data-keep-language><span data-language="en">Privacy</span><span data-language="ru" hidden>Конфиденциальность</span></a></nav></footer>
+</div><script>const supported=['en','ru']; const requested=new URLSearchParams(location.search).get('lang');
+const lang=supported.includes(requested)?requested:navigator.language.toLowerCase().startsWith('ru')?'ru':'en';
+document.documentElement.lang=lang;
+for(const element of document.querySelectorAll('[data-language]')) element.hidden=element.dataset.language!==lang;
+document.title=document.querySelector('main:not([hidden]) h1').textContent+' · SoNa';
+for(const link of document.querySelectorAll('[data-keep-language]')){const url=new URL(link.href);url.searchParams.set('lang',lang);link.href=url.href;}
+document.querySelector('nav a[hreflang="'+lang+'"]').setAttribute('aria-current','true');</script></body></html>
