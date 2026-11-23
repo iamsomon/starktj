@@ -1,0 +1,19 @@
+Stark Eyes — Solar System Atlas
+
+Surface and ring maps (Sun, Mercury–Neptune, Moon and Saturn’s rings):
+Solar System Scope, https://www.solarsystemscope.com/textures/.
+License: Creative Commons Attribution 4.0 International,
+https://creativecommons.org/licenses/by/4.0/.
+Maps were resized and converted to WebP. The globe previews were rendered
+from these maps and use illustrative lighting.
+
+Pluto surface map: PIA19956, NASA / Johns Hopkins University Applied Physics
+Laboratory / Southwest Research Institute. This enhanced-color New Horizons
+mosaic was resized and encoded as WebP. The globe preview uses illustrative
+lighting. The map contains gaps where imagery was unavailable.
+https://science.nasa.gov/photojournal/pluto-in-extended-color/
+
+Planet diameters and overview:
+https://science.nasa.gov/solar-system/planets/planet-sizes-and-locations-in-our-solar-system/
+
+Licenses for the included libraries and fonts are in ./licenses/.
